@@ -26,7 +26,7 @@ These instructions will help you run the project locally.
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (v14 or later)
+- [Node.js](https://nodejs.org/) (v18 or later)
 - npm (included with Node.js)
 
 ### Installation
