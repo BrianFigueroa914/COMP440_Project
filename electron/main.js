@@ -9,7 +9,11 @@ function createWindow() {
     }
   });
 
-  win.loadFile('src/pages/loginPage/index.html'); // or loadURL('https://your-web-app.com')
+  win.loadFile('src/ui/loginPage/index.html'); 
+
+
+
+
 }
 
 app.whenReady().then(createWindow);
