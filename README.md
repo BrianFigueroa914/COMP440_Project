@@ -1,62 +1,115 @@
-# COMP440_Project# COMP440_Project
 
-A sample Electron-based application with a Java backend developed for the COMP440 course. This repository contains the source code for a login interface, dashboard, utility components, and database connectivity.
+An Electron-based application with a simple Java backend for user authentication, built for the COMP440 course. The app provides a login/signup UI and stores credentials in a local MySQL database.
+
+---
 
 ## 📁 Project Structure
 
 ```
 COMP440_Project/
   lib/
-    mysql-connector-j_9.6.0.jar
+    mysql-connector-j_9.6.0.jar        # JDBC driver
   electron/
-    main.js
+    main.js                            # Electron entry point
     package.json
-    styles.css
+    styles.css                         # shared CSS
     src/
-      assets/
-      components/
-      pages/
-        dashboard/
+      assets/                          # static assets (images, etc.)
+      components/                      # reusable UI pieces
+      database/                        # Java database helpers
+        DatabaseConnection.java
+      models/                          # Java data models (User.java)
+      routers/
+      services/                        # Java HTTP server + auth logic
+        AuthService.java
+        Server.java
+      ui/
         loginPage/
           index.html
-      routers/
-        databaseConnection.java
-      utils/
+          login.js
+        signupPage/
+          index.html
+          signup.js
+        dashboard/
+          index.html                       
 ```
 
-## 🚀 Getting Started
+> _Note_: the `src/ui` folder contains the front‑end pages that Electron loads.
 
-These instructions will help you run the project locally.
+---
 
-- [Java JDK](https://adoptium.net/) (v11 or later)
-- MySQL server (for database connectivity)
-### Prerequisites
+## ⚙️ Prerequisites
 
-- [Node.js](https://nodejs.org/) (v18 or later)
-- npm (included with Node.js)
+1. **Node.js** (v18 or later) and npm – required for the Electron frontend.
+2. **Java JDK** (v11 or later) – needed to compile/run the backend server.
+3. **MySQL Server** – host the `mydb` database used by the backend.
+4. **MySQL Connector/J** – download the JAR and put it in the project `lib/` folder.
 
+---
 
-Download the MySQL Connector/J JAR file (`mysql-connector-j_9.6.0.jar`) from the [official MySQL website](https://dev.mysql.com/downloads/connector/j/) and place it in the `lib/` folder.
-### Installation
+## 🔧 Setup & Installation
 
+1. Clone the repository and navigate to the workspace root.
+2. Place `mysql-connector-j_9.6.0.jar` inside `COMP440_Project/lib/`.
+3. Install Electron dependencies:
+   ```bash
+   cd COMP440_Project/electron
+   npm install
+   ```
+4. Create the database and table in MySQL:
+   ```sql
+   CREATE DATABASE mydb;
+   USE mydb;
+   CREATE TABLE user (
+     id INT AUTO_INCREMENT PRIMARY KEY,
+     username VARCHAR(255) UNIQUE,
+     password VARCHAR(255)
+   );
+   ```
+
+---
+
+## ▶️ Running the Application
+
+Start the Java backend (in one terminal): ~not working yet~
+```bash
+cd COMP440_Project/electron/src
+javac -cp ../../lib/mysql-connector-j_9.6.0.jar \
+      models/User.java \
+      database/DatabaseConnection.java \
+      services/AuthService.java \
+      services/Server.java
+java -cp .;../../lib/mysql-connector-j_9.6.0.jar services.Server
+```
+> On Linux/macOS use `:` instead of `;` in the classpath.
+
+Then launch Electron (in a separate terminal):
 ```bash
 cd COMP440_Project/electron
-npm install
-```
-
-### Running the Application
-
-```bash
 npm start
 ```
+The app will open to the login page; signup and login actions communicate with the backend.
 
-This should launelectron/src/pages` and `electron/main.js` for app logic.
-- Styles are located in `electron/styles.css`.
-- Database connectivity is handled in `electron/src/routers/databaseConnection.java
-## 🛠️ Development
+---
 
-- Modify UI in `src/pages` and `electron/main.js` for app logic.
-- Styles are located in `electron/styles.css`.
+## 🛠 Development Notes
+
+* **UI:** edit files under `electron/src/ui`; pages share `styles.css`.
+* **Backend:** modify `services/AuthService.java` for auth logic or `Server.java` to add endpoints.
+* **Database:** adjust `database/DatabaseConnection.java` connection string as needed.
+* **Recompilation:** after changing Java code, re-run the `javac` command above.
+
+---
+
+## ℹ️ Useful Commands
+
+| Task | Command |
+|------|---------|
+| Compile backend | see "Running the Application" section |
+| Start backend | same as compile (runs server) |
+| Launch Electron | `npm start` (from `electron/`) |
+
+---
 
 ## 📄 License
 
