@@ -58,3 +58,11 @@ button:hover {
   text-align: center;
   margin-top: 10px;
 }
+
+.help-text {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+  font-weight: normal;
+}

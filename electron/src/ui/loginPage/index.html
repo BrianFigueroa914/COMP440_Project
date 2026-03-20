@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../../styles.css" />
 </head>
 <body>
   <div class="login-container">
@@ -13,12 +13,16 @@
     <form id="loginForm">
       <div class="input-group">
         <label for="username">Username</label>
-        <input id="username" type="text" required />
+        <input id="username" type="text" required minlength="3" maxlength="50" 
+               pattern="[a-zA-Z0-9_-]+" 
+               placeholder="3-50 chars: letters, numbers, - or _" />
+        <small class="help-text">Only letters, numbers, underscores, and hyphens allowed</small>
       </div>
 
       <div class="input-group">
         <label for="password">Password</label>
-        <input id="password" type="password" required />
+        <input id="password" type="password" required minlength="6" maxlength="128" 
+               placeholder="6-128 characters" />
       </div>
 
       <button type="submit">Login</button>
@@ -31,6 +35,7 @@
     <button id="signupBtn">Sign Up</button>
   </div>
 
+  <script src="../utils/validation.js"></script>
   <script src="login.js"></script>
 </body>
 </html>
