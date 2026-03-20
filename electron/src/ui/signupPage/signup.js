@@ -3,12 +3,21 @@
 document.getElementById('signupForm').addEventListener('submit', async function(event) {
   event.preventDefault();
 
-  const username = document.getElementById('username').value;
+  const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
   const confirmPassword = document.getElementById('confirmPassword').value;
 
-  if (password !== confirmPassword) {
-    document.getElementById('errorMsg').textContent = 'Passwords do not match.';
+  // Client-side validation using centralized validator
+  let validation = InputValidator.validateCredentials(username, password);
+  if (!validation.valid) {
+    document.getElementById('errorMsg').textContent = validation.error;
+    return;
+  }
+
+  // Validate password match
+  validation = InputValidator.validatePasswordMatch(password, confirmPassword);
+  if (!validation.valid) {
+    document.getElementById('errorMsg').textContent = validation.error;
     return;
   }
 

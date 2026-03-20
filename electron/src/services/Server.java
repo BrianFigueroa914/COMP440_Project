@@ -49,10 +49,14 @@ public class Server {
                     String username = extractJsonValue(requestBody, "username");
                     String password = extractJsonValue(requestBody, "password");
 
-                    // Validate fields
-                    if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
+                    // Validate credentials using centralized validator
+                    InputValidator.ValidationResult validationResult = 
+                        InputValidator.validateCredentials(username, password);
+                    
+                    if (!validationResult.isValid()) {
+                        System.out.println("✗ Invalid input attempt: " + validationResult.getErrorMessage());
                         sendJsonResponse(exchange, 400, 
-                            "{\"success\": false, \"error\": \"Username and password are required.\"}");
+                            "{\"success\": false, \"error\": \"" + escapeJson(validationResult.getErrorMessage()) + "\"}");
                         return;
                     }
 
@@ -96,10 +100,14 @@ public class Server {
                     String username = extractJsonValue(requestBody, "username");
                     String password = extractJsonValue(requestBody, "password");
 
-                    // Validate fields
-                    if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
+                    // Validate credentials using centralized validator
+                    InputValidator.ValidationResult validationResult = 
+                        InputValidator.validateCredentials(username, password);
+                    
+                    if (!validationResult.isValid()) {
+                        System.out.println("✗ Invalid login attempt: " + validationResult.getErrorMessage());
                         sendJsonResponse(exchange, 400, 
-                            "{\"success\": false, \"error\": \"Username and password are required.\"}");
+                            "{\"success\": false, \"error\": \"" + escapeJson(validationResult.getErrorMessage()) + "\"}");
                         return;
                     }
 
