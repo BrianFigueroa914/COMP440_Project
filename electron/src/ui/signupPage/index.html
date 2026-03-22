@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="../../styles.css" />
+</head>
+<body>
+  <div class="login-container">
+    <h2>Sign Up</h2>
+
+    <form id="signupForm">
+      <div class="input-group">
+        <label for="username">Username</label>
+        <input id="username" type="text" required minlength="3" maxlength="50" 
+               pattern="[a-zA-Z0-9_-]+" 
+               placeholder="3-50 chars: letters, numbers, - or _" />
+        <small class="help-text">Only letters, numbers, underscores, and hyphens allowed</small>
+      </div>
+
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" required minlength="6" maxlength="128" 
+               placeholder="6-128 characters" />
+        <small class="help-text">Minimum 6 characters</small>
+      </div>
+
+      <div class="input-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input id="confirmPassword" type="password" required minlength="6" maxlength="128" 
+               placeholder="Re-enter password" />
+      </div>
+
+      <button type="submit">Sign Up</button>
+    </form>
+
+    <p class="error" id="errorMsg"></p>
+  </div>
+
+  <div class="login-link">
+    <button id="loginBtn">Back to Login</button>
+  </div>
+
+  <script src="../utils/validation.js"></script>
+  <script src="signup.js"></script>
+</body>
+</html>
