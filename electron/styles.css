@@ -47,14 +47,17 @@ h2 {
   color: #6bc5c0;
 }
 
-.input-group {
-  margin-bottom: 15px;
+input:focus {
+  background: #ffffff;
+  box-shadow: 0 0 0 2px rgba(127, 208, 212, .8)
 }
 
 label {
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 600;
   display: block;
   margin-bottom: 5px;
+  color: #333;
 }
 
 input {
