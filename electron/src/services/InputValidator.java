@@ -16,6 +16,10 @@ public class InputValidator {
     private static final int MAX_USERNAME_LENGTH = 255;
     private static final int MIN_PASSWORD_LENGTH = 6;
     private static final int MAX_PASSWORD_LENGTH = 255;
+    private static final int MAX_NAME_LENGTH = 50;
+    private static final int MAX_EMAIL_LENGTH = 100;
+    private static final int MIN_PHONE_LENGTH = 10;
+    private static final int MAX_PHONE_LENGTH = 15;
 
     /**
      * Validates username for security and format
@@ -136,6 +140,95 @@ public class InputValidator {
         }
 
         return new ValidationResult(true, "");
+    }
+
+    public static ValidationResult validateFirstName(String firstName) {
+        if (firstName == null || firstName.trim().isEmpty()) {
+            return new ValidationResult(false, "First name is required.");
+        }
+
+        if (firstName.length() > MAX_NAME_LENGTH) {
+            return new ValidationResult(false, "First name must not exceed " + MAX_NAME_LENGTH + " characters.");
+        }
+
+        if (!firstName.matches("^[a-zA-Z][a-zA-Z\\s'-]*$")) {
+            return new ValidationResult(false, "First name contains invalid characters.");
+        }
+
+        return new ValidationResult(true, "");
+    }
+
+    public static ValidationResult validateLastName(String lastName) {
+        if (lastName == null || lastName.trim().isEmpty()) {
+            return new ValidationResult(false, "Last name is required.");
+        }
+
+        if (lastName.length() > MAX_NAME_LENGTH) {
+            return new ValidationResult(false, "Last name must not exceed " + MAX_NAME_LENGTH + " characters.");
+        }
+
+        if (!lastName.matches("^[a-zA-Z][a-zA-Z\\s'-]*$")) {
+            return new ValidationResult(false, "Last name contains invalid characters.");
+        }
+
+        return new ValidationResult(true, "");
+    }
+
+    public static ValidationResult validateEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return new ValidationResult(false, "Email is required.");
+        }
+
+        if (email.length() > MAX_EMAIL_LENGTH) {
+            return new ValidationResult(false, "Email must not exceed " + MAX_EMAIL_LENGTH + " characters.");
+        }
+
+        if (!email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            return new ValidationResult(false, "Email format is invalid.");
+        }
+
+        return new ValidationResult(true, "");
+    }
+
+    public static ValidationResult validatePhone(String phone) {
+        if (phone == null || phone.trim().isEmpty()) {
+            return new ValidationResult(false, "Phone number is required.");
+        }
+
+        if (phone.length() < MIN_PHONE_LENGTH || phone.length() > MAX_PHONE_LENGTH) {
+            return new ValidationResult(false, "Phone number must be between " + MIN_PHONE_LENGTH + " and " + MAX_PHONE_LENGTH + " characters.");
+        }
+
+        if (!phone.matches("^[0-9+()\\-\\s]+$")) {
+            return new ValidationResult(false, "Phone number contains invalid characters.");
+        }
+
+        return new ValidationResult(true, "");
+    }
+
+    public static ValidationResult validateRegistrationData(String username, String password, String firstName,
+                                                            String lastName, String email, String phone) {
+        ValidationResult result = validateCredentials(username, password);
+        if (!result.isValid()) {
+            return result;
+        }
+
+        result = validateFirstName(firstName);
+        if (!result.isValid()) {
+            return result;
+        }
+
+        result = validateLastName(lastName);
+        if (!result.isValid()) {
+            return result;
+        }
+
+        result = validateEmail(email);
+        if (!result.isValid()) {
+            return result;
+        }
+
+        return validatePhone(phone);
     }
 
     /**

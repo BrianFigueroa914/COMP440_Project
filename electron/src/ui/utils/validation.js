@@ -12,6 +12,10 @@ const InputValidator = {
     MAX_USERNAME_LENGTH: 255,
     MIN_PASSWORD_LENGTH: 6,
     MAX_PASSWORD_LENGTH: 255,
+    MAX_NAME_LENGTH: 50,
+    MAX_EMAIL_LENGTH: 100,
+    MIN_PHONE_LENGTH: 10,
+    MAX_PHONE_LENGTH: 15,
 
     /**
      * Validates username for security and format
@@ -119,5 +123,93 @@ const InputValidator = {
         }
 
         return { valid: true, error: '' };
+    },
+
+    validateFirstName(firstName) {
+        if (!firstName || firstName.trim() === '') {
+            return { valid: false, error: 'First name is required.' };
+        }
+
+        if (firstName.length > this.MAX_NAME_LENGTH) {
+            return { valid: false, error: `First name must not exceed ${this.MAX_NAME_LENGTH} characters.` };
+        }
+
+        if (!/^[a-zA-Z][a-zA-Z\s'-]*$/.test(firstName)) {
+            return { valid: false, error: 'First name contains invalid characters.' };
+        }
+
+        return { valid: true, error: '' };
+    },
+
+    validateLastName(lastName) {
+        if (!lastName || lastName.trim() === '') {
+            return { valid: false, error: 'Last name is required.' };
+        }
+
+        if (lastName.length > this.MAX_NAME_LENGTH) {
+            return { valid: false, error: `Last name must not exceed ${this.MAX_NAME_LENGTH} characters.` };
+        }
+
+        if (!/^[a-zA-Z][a-zA-Z\s'-]*$/.test(lastName)) {
+            return { valid: false, error: 'Last name contains invalid characters.' };
+        }
+
+        return { valid: true, error: '' };
+    },
+
+    validateEmail(email) {
+        if (!email || email.trim() === '') {
+            return { valid: false, error: 'Email is required.' };
+        }
+
+        if (email.length > this.MAX_EMAIL_LENGTH) {
+            return { valid: false, error: `Email must not exceed ${this.MAX_EMAIL_LENGTH} characters.` };
+        }
+
+        if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)) {
+            return { valid: false, error: 'Email format is invalid.' };
+        }
+
+        return { valid: true, error: '' };
+    },
+
+    validatePhone(phone) {
+        if (!phone || phone.trim() === '') {
+            return { valid: false, error: 'Phone number is required.' };
+        }
+
+        if (phone.length < this.MIN_PHONE_LENGTH || phone.length > this.MAX_PHONE_LENGTH) {
+            return { valid: false, error: `Phone number must be between ${this.MIN_PHONE_LENGTH} and ${this.MAX_PHONE_LENGTH} characters.` };
+        }
+
+        if (!/^[0-9+()\-\s]+$/.test(phone)) {
+            return { valid: false, error: 'Phone number contains invalid characters.' };
+        }
+
+        return { valid: true, error: '' };
+    },
+
+    validateRegistrationData(username, password, firstName, lastName, email, phone) {
+        let result = this.validateCredentials(username, password);
+        if (!result.valid) {
+            return result;
+        }
+
+        result = this.validateFirstName(firstName);
+        if (!result.valid) {
+            return result;
+        }
+
+        result = this.validateLastName(lastName);
+        if (!result.valid) {
+            return result;
+        }
+
+        result = this.validateEmail(email);
+        if (!result.valid) {
+            return result;
+        }
+
+        return this.validatePhone(phone);
     }
 };

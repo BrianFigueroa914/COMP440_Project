@@ -1,6 +1,26 @@
 // login.js
 
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
+const loginForm = document.getElementById('loginForm');
+const loginErrorEl = document.getElementById('errorMsg');
+const loginFields = ['username', 'password'];
+
+function clearLoginError() {
+  loginErrorEl.textContent = '';
+}
+
+loginFields.forEach((id) => {
+  const field = document.getElementById(id);
+  if (!field) {
+    return;
+  }
+
+  // Ensure fields remain editable after failed attempts.
+  field.disabled = false;
+  field.readOnly = false;
+  field.addEventListener('input', clearLoginError);
+});
+
+loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const username = document.getElementById("username").value.trim();
@@ -9,7 +29,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   // Client-side validation using centralized validator
   const validation = InputValidator.validateCredentials(username, password);
   if (!validation.valid) {
-    document.getElementById('errorMsg').textContent = validation.error;
+    loginErrorEl.textContent = validation.error;
     return;
   }
 
@@ -22,13 +42,12 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
     const result = await response.json();
     if (result.success) {
-      alert('Login successful!');
       window.location.href = '../dashboard/index.html';
     } else {
-      document.getElementById('errorMsg').textContent = result.error || 'Login failed.';
+      loginErrorEl.textContent = result.error || 'Login failed.';
     }
   } catch (error) {
-    document.getElementById('errorMsg').textContent = 'Network error. Please try again.';
+    loginErrorEl.textContent = 'Network error. Please try again.';
     console.error('Login error:', error);
   }
 });

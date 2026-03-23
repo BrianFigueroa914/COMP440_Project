@@ -1,9 +1,9 @@
 package services;
 
-import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-
+import com.sun.net.httpserver.HttpServer;
+import database.DatabaseConnection;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -11,8 +11,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import database.DatabaseConnection;
 
 public class Server {
     private static final int PORT = 8080;
@@ -48,10 +46,14 @@ public class Server {
                     String requestBody = readRequestBody(exchange);
                     String username = extractJsonValue(requestBody, "username");
                     String password = extractJsonValue(requestBody, "password");
+                    String firstName = extractJsonValue(requestBody, "firstName");
+                    String lastName = extractJsonValue(requestBody, "lastName");
+                    String email = extractJsonValue(requestBody, "email");
+                    String phone = extractJsonValue(requestBody, "phoneNumber");
 
-                    // Validate credentials using centralized validator
+                    // Validate registration data using centralized validator
                     InputValidator.ValidationResult validationResult = 
-                        InputValidator.validateCredentials(username, password);
+                        InputValidator.validateRegistrationData(username, password, firstName, lastName, email, phone);
                     
                     if (!validationResult.isValid()) {
                         System.out.println("✗ Invalid input attempt: " + validationResult.getErrorMessage());
@@ -61,16 +63,17 @@ public class Server {
                     }
 
                     // Register user
-                    boolean success = authService.registerUser(username, password);
+                    AuthService.RegistrationResult registrationResult =
+                        authService.registerUser(username, password, firstName, lastName, email, phone);
 
-                    if (success) {
+                    if (registrationResult.isSuccess()) {
                         System.out.println("✓ User registered: " + username);
                         sendJsonResponse(exchange, 200, 
                             "{\"success\": true, \"message\": \"User registered successfully.\"}");
                     } else {
                         System.out.println("✗ Registration failed for user: " + username);
                         sendJsonResponse(exchange, 400, 
-                            "{\"success\": false, \"error\": \"Registration failed. Username may already exist.\"}");
+                            "{\"success\": false, \"error\": \"" + escapeJson(registrationResult.getErrorMessage()) + "\"}");
                     }
 
                 } catch (Exception e) {
