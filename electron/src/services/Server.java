@@ -11,6 +11,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Server {
     private static final int PORT = 8080;
@@ -50,6 +52,28 @@ public class Server {
                     String lastName = extractJsonValue(requestBody, "lastName");
                     String email = extractJsonValue(requestBody, "email");
                     String phone = extractJsonValue(requestBody, "phoneNumber");
+                    if (firstName == null || firstName.trim().isEmpty()) {
+                        firstName = extractJsonValue(requestBody, "first_name");
+                    }
+                    if (lastName == null || lastName.trim().isEmpty()) {
+                        lastName = extractJsonValue(requestBody, "last_name");
+                    }
+                    if (email == null || email.trim().isEmpty()) {
+                        email = extractJsonValue(requestBody, "emailAddress");
+                    }
+                    if (phone == null || phone.trim().isEmpty()) {
+                        phone = extractJsonValue(requestBody, "phone_number");
+                    }
+                    if (phone == null || phone.trim().isEmpty()) {
+                        phone = extractJsonValue(requestBody, "phone");
+                    }
+
+                    // Debug parsed registration values without exposing password.
+                    System.out.println("Register payload parsed for user='" + username
+                        + "' firstName='" + firstName
+                        + "' lastName='" + lastName
+                        + "' email='" + email
+                        + "' phone='" + phone + "'");
 
                     // Validate registration data using centralized validator
                     InputValidator.ValidationResult validationResult = 
@@ -196,26 +220,29 @@ public class Server {
 
     // Helper: Extract value from JSON string manually (no external JSON library needed)
     private static String extractJsonValue(String json, String key) {
-        String searchKey = "\"" + key + "\":";
-        int startIndex = json.indexOf(searchKey);
-        if (startIndex == -1) {
-            return null;
-        }
-        startIndex += searchKey.length();
-
-        // Find the opening quote
-        int quoteIndex = json.indexOf("\"", startIndex);
-        if (quoteIndex == -1) {
+        if (json == null || key == null) {
             return null;
         }
 
-        // Find the closing quote
-        int endIndex = json.indexOf("\"", quoteIndex + 1);
-        if (endIndex == -1) {
+        Pattern pattern = Pattern.compile("\\\"" + Pattern.quote(key) + "\\\"\\s*:\\s*\\\"((?:\\\\\\\"|[^\\\"])*)\\\"");
+        Matcher matcher = pattern.matcher(json);
+        if (!matcher.find()) {
             return null;
         }
 
-        return json.substring(quoteIndex + 1, endIndex);
+        return unescapeJsonString(matcher.group(1));
+    }
+
+    private static String unescapeJsonString(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        return value.replace("\\\\", "\\")
+                    .replace("\\\"", "\"")
+                    .replace("\\n", "\n")
+                    .replace("\\r", "\r")
+                    .replace("\\t", "\t");
     }
 
     // Helper: Escape special characters for JSON string
