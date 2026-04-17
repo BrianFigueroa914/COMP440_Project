@@ -20,7 +20,7 @@ public class TestConnection {
     private static void testConnection() {
         String url = "jdbc:mysql://127.0.0.1:3306/mydb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
         String user = "root";
-        String password = "fnysse";
+        String password = "password";
 
         System.out.println("Attempting to connect to MySQL server...");
         System.out.println("URL: " + url);

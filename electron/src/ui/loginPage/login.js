@@ -7,10 +7,9 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   const password = document.getElementById("password").value;
 
   // Client-side validation using centralized validator
-  const validation = InputValidator.validateCredentials(username, password);
-  if (!validation.valid) {
-    document.getElementById('errorMsg').textContent = validation.error;
-    return;
+  if (!username || !password) {
+  document.getElementById('errorMsg').textContent = "Username and password required.";
+  return;
   }
 
   try {
@@ -23,6 +22,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     const result = await response.json();
     if (result.success) {
       alert('Login successful!');
+      localStorage.setItem("username", username);
       window.location.href = '../dashboard/index.html';
     } else {
       document.getElementById('errorMsg').textContent = result.error || 'Login failed.';

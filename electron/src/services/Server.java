@@ -12,11 +12,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+
 import database.DatabaseConnection;
 
 public class Server {
     private static final int PORT = 8080;
     private static AuthService authService = new AuthService();
+    private static RentalService rentalService = new RentalService();
+    private static ReviewService reviewService = new ReviewService();
 
     public static void main(String[] args) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
@@ -24,6 +27,9 @@ public class Server {
         // Register endpoint handlers
         server.createContext("/register", new RegisterHandler());
         server.createContext("/login", new LoginHandler());
+        server.createContext("/addRental", new AddRentalHandler());
+        server.createContext("/search", new SearchHandler());
+        server.createContext("/review", new ReviewHandler());
 
         server.setExecutor(null); // use default executor
         server.start();
@@ -134,6 +140,88 @@ public class Server {
             }
         }
     }
+    static class AddRentalHandler implements HttpHandler {
+        public void handle(HttpExchange exchange) throws IOException {
+            if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+
+                String body = readRequestBody(exchange);
+
+                models.RentalUnit rental = new models.RentalUnit(
+                    extractJsonValue(body, "username"),
+                    extractJsonValue(body, "title"),
+                    extractJsonValue(body, "description"),
+                    extractJsonValue(body, "feature"),
+                    Integer.parseInt(extractJsonValue(body, "price"))
+                );
+
+                boolean success = rentalService.addRental(rental);
+
+                if (success)
+                    sendJsonResponse(exchange, 200, "{\"success\":true}");
+                else
+                    sendJsonResponse(exchange, 400, "{\"error\":\"Limit reached or failed\"}");
+            }
+        }
+    }
+
+    static class SearchHandler implements HttpHandler {
+        public void handle(HttpExchange exchange) throws IOException {
+            if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+
+                String query = exchange.getRequestURI().getQuery();
+                String feature = query.split("=")[1];
+
+                String sql = "SELECT * FROM rental_unit WHERE feature LIKE ?";
+
+                try (Connection conn = DatabaseConnection.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                    stmt.setString(1, "%" + feature + "%");
+                    ResultSet rs = stmt.executeQuery();
+
+                    StringBuilder result = new StringBuilder("[");
+                    boolean first = true;
+
+                    while (rs.next()) {
+                        if (!first) result.append(",");
+                        first = false;
+
+                        result.append("{\"id\":").append(rs.getInt("id"))
+                              .append(",\"title\":\"").append(rs.getString("title")).append("\"}");
+                    }
+
+                    result.append("]");
+                    sendJsonResponse(exchange, 200, result.toString());
+                } catch (Exception e) {
+                    sendJsonResponse(exchange, 500, "{\"error\":\"Search failed\"}");
+                }
+            }
+        }
+    }
+
+    static class ReviewHandler implements HttpHandler {
+        public void handle(HttpExchange exchange) throws IOException {
+            if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+
+                String body = readRequestBody(exchange);
+
+                models.Review review = new models.Review(
+                    Integer.parseInt(extractJsonValue(body, "rental_id")),
+                    extractJsonValue(body, "username"),
+                    extractJsonValue(body, "rating"),
+                    extractJsonValue(body, "comment")
+                );
+
+                boolean success = reviewService.addReview(review);
+
+                if (success)
+                    sendJsonResponse(exchange, 200, "{\"success\":true}");
+                else
+                    sendJsonResponse(exchange, 400, "{\"error\":\"Review failed\"}");
+            }
+        }
+    }
+
 
     // Authenticate user by checking username and password against database
     private static boolean authenticateUser(String username, String password) {
