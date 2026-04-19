@@ -2,21 +2,54 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard</title>
   <link rel="stylesheet" href="../../styles.css" />
 </head>
 <body>
   <div class="dashboard-container">
     <h2>Welcome to the Dashboard</h2>
+    <p id="welcomeText"></p>
     <p>You are logged in!</p>
+
     <button id="logoutBtn">Logout</button>
+
+    <hr />
+
+    <!-- ADD RENTAL -->
+    <h3>Add Rental</h3>
+    <input id="title" placeholder="Title" />
+    <input id="description" placeholder="Description" />
+    <input id="feature" placeholder="Feature (wifi, kitchen...)" />
+    <input id="price" placeholder="Price" />
+    <button id="addRentalBtn">Add Rental</button>
+
+    <hr />
+
+    <!-- SEARCH -->
+    <h3>Search Rentals</h3>
+    <input id="searchFeature" placeholder="Enter feature" />
+    <button id="searchBtn">Search</button>
+
+    <ul id="results"></ul>
+
+    <hr />
+
+    <!-- REVIEW -->
+    <h3>Add Review</h3>
+    <input id="rentalId" placeholder="Rental ID" />
+
+    <select id="rating">
+      <option value="excellent">Excellent</option>
+      <option value="good">Good</option>
+      <option value="fair">Fair</option>
+      <option value="poor">Poor</option>
+    </select>
+
+    <input id="comment" placeholder="Comment" />
+    <button id="reviewBtn">Submit Review</button>
   </div>
 
-  <script>
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-      window.location.href = '../loginPage/index.html';
-    });
-  </script>
+  <script src="dashboard.js"></script>
 </body>
 </html>
