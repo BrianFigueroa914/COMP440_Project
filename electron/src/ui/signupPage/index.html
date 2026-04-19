@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="../../../styles.css" />
+</head>
+<body>
+  <div class="login-container">
+    <div class="header">
+      <div class="logo">
+        <img src="../../../logo.png" alt="Logo" />
+      </div>
+      <h2>Place Holding INC.</h2>
+    </div>
+
+    <form id="signupForm">
+      <div class="input-group">
+        <label for="username">Username:</label>
+        <input id="username" type="text" required minlength="3" maxlength="50" 
+               pattern="[a-zA-Z0-9_-]+" 
+               placeholder="3-50 chars: letters, numbers, - or _" />
+      </div>
+
+      <div class="input-group">
+        <label for="password">Password:</label>
+        <input id="password" type="password" required minlength="6" maxlength="128" 
+               placeholder="6-128 characters" />
+      </div>
+
+      <div class="input-group">
+        <label for="confirmPassword">Confirm Password:</label>
+        <input id="confirmPassword" type="password" required minlength="6" maxlength="128" 
+               placeholder="Re-enter password" />
+      </div>
+
+      <div class="input-group">
+        <label for="firstName">First Name</label>
+        <input id="firstName" type="text" required minlength="1" maxlength="50" 
+               placeholder="Enter your first name" />
+      </div>
+            
+      <div class="input-group">
+        <label for="lastName">Last Name</label>
+        <input id="lastName" type="text" required minlength="1" maxlength="50" 
+               placeholder="Enter your last name" />
+      </div>
+
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input id="email" type="email" required maxlength="100" 
+               placeholder="Enter your email" />
+      </div>
+
+      <div class="input-group">
+        <label for="phoneNumber">Phone Number</label>
+        <input id="phoneNumber" type="text" required minlength="10" maxlength="15" 
+               placeholder="Enter your phone number" />
+      </div>
+
+      <button type="submit">Sign Up</button>
+      <button id="loginBtn">Back to Login</button>
+    </form>
+    </div>
+
+    <p class="error" id="errorMsg"></p>
+  </div>
+
+  <div class="login-link">
+    <button id="loginBtn">Back to Login</button>
+  </div>
+
+  <script src="../utils/modal.js"></script>
+  <script src="../utils/validation.js"></script>
+  <script src="signup.js"></script>
+</body>
+</html>
