@@ -1,3 +1,6 @@
+DROP TABLE IF EXISTS review;
+DROP TABLE IF EXISTS rental_unit;
+
 CREATE TABLE rental_unit (
    id INT AUTO_INCREMENT PRIMARY KEY,
    username VARCHAR(255) NOT NULL,
