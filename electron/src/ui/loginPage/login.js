@@ -21,7 +21,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
     const result = await response.json();
     if (result.success) {
-      alert('Login successful!');
+      // alert('Login successful!');
       localStorage.setItem("username", username);
       window.location.href = '../dashboard/index.html';
     } else {
