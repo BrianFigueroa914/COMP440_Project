@@ -5,7 +5,8 @@ function createWindow() {
     width: 1200,
     height: 800,
     webPreferences: {
-      preload: __dirname + '/preload.js'
+      nodeIntegration: false,
+      contextIsolation: true
     }
   });
 

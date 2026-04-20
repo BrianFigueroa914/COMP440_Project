@@ -157,3 +157,95 @@ button[type="submit"] {
   min-width: 88px;
   padding: 10px 14px;
 }
+
+.dashboard-page {
+  display: block;
+  height: auto;
+  padding: 24px 0;
+}
+
+.dashboard-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 28px 36px;
+  background: #f4f4f4;
+  border-radius: 20px;
+}
+
+.dashboard-header {
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.dashboard-header h2 {
+  margin: 0 0 12px;
+  text-align: left;
+  font-size: 32px;
+  font-weight: 700;
+  color: #2f6f73;
+}
+
+.dashboard-section {
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 16px;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.form-field {
+  flex: 1 1 220px;
+}
+
+input, select {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.button-group {
+  margin-top: 4px;
+}
+
+.dashboard-section h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.dashboard-header p {
+  font-weight: 600;
+}
+
+select {
+  padding: 12px 40px 12px 14px;
+  border-radius: 25px;
+  border: none;
+  outline: none;
+  appearance: none;
+  background: #dcdcdc;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 20px center;
+}
+
+.form-msg {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 8px;
+  min-height: 18px;
+}
+
+.form-msg.success {
+  color: #2e7d32; 
+}
+
+.form-msg.error {
+  color: #d32f2f;
+}

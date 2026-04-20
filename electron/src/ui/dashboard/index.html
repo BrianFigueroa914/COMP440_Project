@@ -4,50 +4,101 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard</title>
-  <link rel="stylesheet" href="../../styles.css" />
+  <link rel="stylesheet" href="../../../styles.css" />
 </head>
-<body>
+<body class = "dashboard-page">
   <div class="dashboard-container">
-    <h2>Welcome to the Dashboard</h2>
-    <p id="welcomeText"></p>
-    <p>You are logged in!</p>
+    <div class="dashboard-header">
+      <div class="header">
+        <div class="logo">
+        </div>
+        <h2>Welcome to the Dashboard</h2>
+      </div>
 
-    <button id="logoutBtn">Logout</button>
+      <p id="welcomeText"></p>
+      <p>You are logged in!</p>
 
-    <hr />
+      <div class="button-group">
+        <button id="logoutBtn" type="button">Logout</button>
+      </div>
+    </div>
 
-    <!-- ADD RENTAL -->
-    <h3>Add Rental</h3>
-    <input id="title" placeholder="Title" />
-    <input id="description" placeholder="Description" />
-    <input id="feature" placeholder="Feature (wifi, kitchen...)" />
-    <input id="price" placeholder="Price" />
-    <button id="addRentalBtn">Add Rental</button>
+    <div class="dashboard-section">
+      <h3>Add Rental</h3>
 
-    <hr />
+      <div class="form-row">
+        <div class="input-group form-field">
+          <label for="title">Title</label>
+          <input id="title" placeholder="Title" />
+        </div>
 
-    <!-- SEARCH -->
-    <h3>Search Rentals</h3>
-    <input id="searchFeature" placeholder="Enter feature" />
-    <button id="searchBtn">Search</button>
+        <div class="input-group form-field">
+          <label for="description">Description</label>
+          <input id="description" placeholder="Description" />
+        </div>
 
-    <ul id="results"></ul>
+        <div class="input-group form-field">
+          <label for="feature">Feature</label>
+          <input id="feature" placeholder="Feature (wifi, kitchen...)" />
+        </div>
 
-    <hr />
+        <div class="input-group form-field">
+          <label for="price">Price</label>
+          <input id="price" placeholder="Price" />
+        </div>
+      </div>
 
-    <!-- REVIEW -->
-    <h3>Add Review</h3>
-    <input id="rentalId" placeholder="Rental ID" />
+      <div class="button-group">
+        <button id="addRentalBtn" type="button">Add Rental</button>
+      </div>
+    </div>
 
-    <select id="rating">
-      <option value="excellent">Excellent</option>
-      <option value="good">Good</option>
-      <option value="fair">Fair</option>
-      <option value="poor">Poor</option>
-    </select>
+    <div class="dashboard-section">
+      <h3>Search Rentals</h3>
 
-    <input id="comment" placeholder="Comment" />
-    <button id="reviewBtn">Submit Review</button>
+      <div class="form-row">
+        <div class="input-group form-field">
+          <label for="searchFeature">Enter Feature</label>
+          <input id="searchFeature" placeholder="Enter feature" />
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button id="searchBtn" type="button">Search</button>
+      </div>
+
+      <ul id="results"></ul>
+    </div>
+
+    <div class="dashboard-section">
+      <h3>Add Review</h3>
+
+      <div class="form-row">
+        <div class="input-group form-field">
+          <label for="rentalId">Rental ID</label>
+          <input id="rentalId" placeholder="Rental ID" />
+        </div>
+
+        <div class="input-group form-field">
+          <label for="rating">Rating</label>
+          <select id="rating">
+            <option value="excellent">Excellent</option>
+            <option value="good">Good</option>
+            <option value="fair">Fair</option>
+            <option value="poor">Poor</option>
+          </select>
+        </div>
+
+        <div class="input-group form-field">
+          <label for="comment">Comment</label>
+          <input id="comment" placeholder="Comment" />
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button id="reviewBtn" type="button">Submit Review</button>
+      </div>
+    </div>
   </div>
 
   <script src="dashboard.js"></script>
