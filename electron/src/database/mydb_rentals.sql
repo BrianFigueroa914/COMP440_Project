@@ -1,7 +1,5 @@
-DROP TABLE IF EXISTS review;
-DROP TABLE IF EXISTS rental_unit;
-
-CREATE TABLE rental_unit (
+USE mydb;
+CREATE TABLE IF NOT EXISTS rental_unit (
    id INT AUTO_INCREMENT PRIMARY KEY,
    username VARCHAR(255) NOT NULL,
    title VARCHAR(255) NOT NULL,
@@ -11,7 +9,7 @@ CREATE TABLE rental_unit (
    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE review (
+CREATE TABLE IF NOT EXISTS review (
    id INT AUTO_INCREMENT PRIMARY KEY,
    rental_id INT NOT NULL,
    username VARCHAR(255) NOT NULL,
@@ -20,3 +18,5 @@ CREATE TABLE review (
    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    FOREIGN KEY (rental_id) REFERENCES rental_unit(id)
 );
+
+SELECT * FROM rental_unit;
