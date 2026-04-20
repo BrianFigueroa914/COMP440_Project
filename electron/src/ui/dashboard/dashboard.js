@@ -3,8 +3,9 @@ const BASE = "http://localhost:8080";
 const username = localStorage.getItem("username");
 
 if (!username) {
-  alert("You are not logged in.");
-  window.location.href = "../loginPage/index.html";
+  AppModal.show("You are not logged in.", "Not Logged In").then(() => {
+    window.location.href = "../loginPage/index.html";
+  });
 }
 
 document.getElementById("welcomeText").innerText =
@@ -32,9 +33,17 @@ document.getElementById("addRentalBtn").addEventListener("click", async () => {
     });
 
     const data = await res.json();
-    alert(data.success ? "Rental added!" : (data.error || "Failed"));
+    if (data.success) {
+      await AppModal.show("Rental added successfully!", "Success");
+      document.getElementById("title").value = "";
+      document.getElementById("description").value = "";
+      document.getElementById("feature").value = "";
+      document.getElementById("price").value = "";
+    } else {
+      await AppModal.show(data.error || "Failed to add rental.", "Error");
+    }
   } catch (err) {
-    alert("Server error");
+    await AppModal.show("Server error. Please try again.", "Error");
   }
 });
 
@@ -50,12 +59,13 @@ document.getElementById("searchBtn").addEventListener("click", async () => {
 
     data.forEach(item => {
       const li = document.createElement("li");
-      li.innerText = `ID: ${item.id} | ${item.title}`;
+      const indicator = item.username == username ? " (Your Rental)" : "";
+      li.innerText = `ID: ${item.id} | ${item.title}${indicator}`;
       results.appendChild(li);
     });
 
   } catch (err) {
-    alert("Search failed");
+    await AppModal.show("Search failed. Please try again.", "Error");
   }
 });
 
@@ -75,8 +85,14 @@ document.getElementById("reviewBtn").addEventListener("click", async () => {
     });
 
     const data = await res.json();
-    alert(data.success ? "Review submitted!" : (data.error || "Failed"));
+    if (data.success) {
+      await AppModal.show("Review submitted successfully!", "Success");
+      document.getElementById("rentalId").value = "";
+      document.getElementById("comment").value = "";
+    } else {
+      await AppModal.show(data.error || "Failed to submit review.", "Error");
+    }
   } catch (err) {
-    alert("Server error");
+    await AppModal.show("Server error. Please try again.", "Error");
   }
 });
