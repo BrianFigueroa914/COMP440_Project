@@ -36,3 +36,6 @@ logs/
 # Build
 out/
 build/
+
+# Java
+*.class
