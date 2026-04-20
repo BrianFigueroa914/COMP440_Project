@@ -1,4 +1,5 @@
 USE mydb;
+
 CREATE TABLE IF NOT EXISTS rental_unit (
    id INT AUTO_INCREMENT PRIMARY KEY,
    username VARCHAR(255) NOT NULL,
@@ -19,4 +20,4 @@ CREATE TABLE IF NOT EXISTS review (
    FOREIGN KEY (rental_id) REFERENCES rental_unit(id)
 );
 
-SELECT * FROM rental_unit;
+SELECT * FROM rental_unit LIMIT 1000;
