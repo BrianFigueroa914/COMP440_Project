@@ -39,3 +39,7 @@ build/
 
 # Java
 *.class
+
+# Local Java database configuration and test helper files
+electron/src/database/DatabaseConnection.java
+electron/src/database/TestConnection.java

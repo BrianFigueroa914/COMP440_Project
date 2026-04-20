@@ -90,8 +90,32 @@ mysql -u root -p
 3. Choose the SQL file: `electron/src/database/mydb_user.sql`
 4. Click Start Import
 
-### Step 3: Verify Database Connection (Optional)
+You should see: `✓ All checks completed!`
 
+### Step 3: Use environment variables for DB credentials
+
+The Java backend now supports the following environment variables:
+- `DB_URL`
+- `DB_USER`
+- `DB_PASSWORD`
+
+If these are set, the backend and test helper will use them automatically. If not, the default values are still used.
+
+#### Use a .env file
+1. Copy `.env.example` to `.env`. (cp .env.example .env)
+2. Update the values for your local MySQL server.
+3. Run the backend from a shell where these variables are loaded.
+
+Your `.env` file should look like this:
+```ini
+DB_URL=jdbc:mysql://127.0.0.1:3306/mydb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+DB_USER=root
+DB_PASSWORD=password
+```
+
+> `.env` is ignored by Git, so each developer can keep private local credentials safely.
+
+### Step 3.1: Verify Database Connection (Optional)
 Run the test connection utility:
 ```bash
 cd COMP440_Project/electron/src
@@ -99,7 +123,23 @@ javac -cp ..\..\lib\mysql-connector-j-9.6.0.jar database/DatabaseConnection.java
 java -cp ".;..\..\lib\mysql-connector-j-9.6.0.jar" database.TestConnection
 ```
 
-You should see: `✓ All checks completed!`
+#### macOS/Linux
+```bash
+export $(grep -v '^#' .env | xargs)
+javac -cp ../../lib/mysql-connector-j-9.6.0.jar database/DatabaseConnection.java database/TestConnection.java
+java -cp ".:../../lib/mysql-connector-j-9.6.0.jar" database.TestConnection
+```
+
+---
+
+> Note: `electron/src/database/DatabaseConnection.java` and `electron/src/database/TestConnection.java` are local, machine-specific files and should not be committed when they contain developer-specific connection settings. These files are ignored by `.gitignore` to prevent merge conflicts between different environments.
+>
+> If they were previously tracked, remove them from Git index with:
+>
+> ```bash
+git rm --cached electron/src/database/DatabaseConnection.java electron/src/database/TestConnection.java
+> git commit -m "Remove local DB helper files from version control"
+> ```
 
 ### Step 4: Install Electron Dependencies
 

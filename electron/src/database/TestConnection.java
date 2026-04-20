@@ -18,9 +18,9 @@ public class TestConnection {
     }
 
     private static void testConnection() {
-        String url = "jdbc:mysql://127.0.0.1:3306/mydb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-        String user = "root";
-        String password = "iLovecoding123!";
+        String url = getEnv("DB_URL", "jdbc:mysql://127.0.0.1:3306/mydb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true");
+        String user = getEnv("DB_USER", "root");
+        String password = getEnv("DB_PASSWORD", "fnysse");
 
         System.out.println("Attempting to connect to MySQL server...");
         System.out.println("URL: " + url);
@@ -100,9 +100,9 @@ public class TestConnection {
 
             // Provide helpful diagnostics
             if (e.getMessage().contains("Access denied")) {
-                System.out.println("DIAGNOSIS: Invalid username or password");
-                System.out.println("  - Check MySQL root password");
-                System.out.println("  - Update password in DatabaseConnection.java\n");
+                System.out.println("DIAGNOSIS: Invalid username or password or user access");
+                System.out.println("  - Check your DB_USER and DB_PASSWORD environment variables or defaults");
+                System.out.println("  - Set DB_URL, DB_USER, DB_PASSWORD if needed\n");
             } else if (e.getMessage().contains("Unknown database")) {
                 System.out.println("DIAGNOSIS: Database 'mydb' does not exist");
                 System.out.println("  - Create database: CREATE DATABASE mydb;\n");
@@ -119,5 +119,10 @@ public class TestConnection {
             System.out.println("   → Error: " + e.getMessage() + "\n");
             e.printStackTrace();
         }
+    }
+
+    private static String getEnv(String key, String defaultValue) {
+        String value = System.getenv(key);
+        return (value == null || value.isEmpty()) ? defaultValue : value;
     }
 }
