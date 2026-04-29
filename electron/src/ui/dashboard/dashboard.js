@@ -9,7 +9,7 @@ if (!username) {
 }
 
 document.getElementById("welcomeText").innerText =
-  "Logged in as: " + username;
+  "Welcome, " + username + "!";
 
 document.getElementById("logoutBtn").addEventListener("click", () => {
   localStorage.removeItem("username");
@@ -59,8 +59,8 @@ document.getElementById("searchBtn").addEventListener("click", async () => {
 
     data.forEach(item => {
       const li = document.createElement("li");
-      const indicator = item.username == username ? " (Your Rental)" : "";
-      li.innerText = `ID: ${item.id} | ${item.title}${indicator}`;
+//      const indicator = item.username == username ? " (Your Rental)" : "";
+      li.innerText = `ID: ${item.id} | ${item.title} | Price: $${item.price}`;
       results.appendChild(li);
     });
 
