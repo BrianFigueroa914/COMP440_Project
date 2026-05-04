@@ -33,6 +33,7 @@ public class Server {
         server.createContext("/addRental", new AddRentalHandler());
         server.createContext("/search", new SearchHandler());
         server.createContext("/review", new ReviewHandler());
+        server.createContext("/searchTwoFeatures", new SearchTwoFeaturesHandler());
 
         server.setExecutor(null); // use default executor
         server.start();
@@ -256,25 +257,24 @@ static class SearchTwoFeaturesHandler implements HttpHandler {
             }
 
             String[] params = query.split("&");
-            String featureX = params[0].split("=")[1];
-            String featureY = params[1].split("=")[1];
+            String featureX = params[0].split("=")[1].toLowerCase();
+            String featureY = params[1].split("=")[1].toLowerCase();
 
             String sql =
-                "SELECT r1.username " +
+                "SELECT DISTINCT r1.username " +
                 "FROM rental_unit r1 " +
                 "JOIN rental_unit r2 " +
                 "  ON r1.username = r2.username " +
                 " AND DATE(r1.created_at) = DATE(r2.created_at) " +
-                "WHERE r1.feature LIKE ? " +
-                "  AND r2.feature LIKE ? " +
-                "  AND r1.id <> r2.id " +
-                "GROUP BY r1.username";
+                "WHERE FIND_IN_SET(?, REPLACE(LOWER(r1.feature), ' ', '')) " +
+                "  AND FIND_IN_SET(?, REPLACE(LOWER(r2.feature), ' ', '')) " +
+                "  AND r1.id <> r2.id";
 
             try (Connection conn = DatabaseConnection.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-                stmt.setString(1, "%" + featureX + "%");
-                stmt.setString(2, "%" + featureY + "%");
+                stmt.setString(1, featureX);
+                stmt.setString(2, featureY);
 
                 ResultSet rs = stmt.executeQuery();
 
@@ -301,6 +301,7 @@ static class SearchTwoFeaturesHandler implements HttpHandler {
         }
     }
 }
+
 
     // Authenticate user by checking username and password against database
     private static boolean authenticateUser(String username, String password) {
