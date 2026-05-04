@@ -219,31 +219,7 @@ public class Server {
         }
     }
 
-    // Handler for POST /review
-    static class ReviewHandler implements HttpHandler {
-        public void handle(HttpExchange exchange) throws IOException {
-            if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
-
-                String body = readRequestBody(exchange);
-
-                models.Review review = new models.Review(
-                    Integer.parseInt(extractJsonValue(body, "rental_id")),
-                    extractJsonValue(body, "username"),
-                    extractJsonValue(body, "rating"),
-                    extractJsonValue(body, "comment")
-                );
-
-                boolean success = reviewService.addReview(review);
-
-                if (success)
-                    sendJsonResponse(exchange, 200, "{\"success\":true}");
-                else
-                    sendJsonResponse(exchange, 400, "{\"error\":\"Review failed\"}");
-            }
-        }
-    }
-
-static class SearchTwoFeaturesHandler implements HttpHandler {
+    static class SearchTwoFeaturesHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
@@ -268,8 +244,8 @@ static class SearchTwoFeaturesHandler implements HttpHandler {
                 "JOIN rental_unit r2 " +
                 "  ON r1.username = r2.username " +
                 " AND DATE(r1.created_at) = DATE(r2.created_at) " +
-                "WHERE FIND_IN_SET(?, REPLACE(LOWER(r1.feature), ' ', '')) " +
-                "  AND FIND_IN_SET(?, REPLACE(LOWER(r2.feature), ' ', '')) " +
+                "WHERE REPLACE(LOWER(r1.feature), ' ', '') LIKE CONCAT('%', ?, '%')" +
+                "  AND REPLACE(LOWER(r2.feature), ' ', '') LIKE CONCAT('%', ?, '%')" +
                 "  AND r1.id <> r2.id";
 
             try (Connection conn = DatabaseConnection.getConnection();
@@ -303,6 +279,30 @@ static class SearchTwoFeaturesHandler implements HttpHandler {
         }
     }
 }
+
+    // Handler for POST /review
+    static class ReviewHandler implements HttpHandler {
+        public void handle(HttpExchange exchange) throws IOException {
+            if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+
+                String body = readRequestBody(exchange);
+
+                models.Review review = new models.Review(
+                    Integer.parseInt(extractJsonValue(body, "rental_id")),
+                    extractJsonValue(body, "username"),
+                    extractJsonValue(body, "rating"),
+                    extractJsonValue(body, "comment")
+                );
+
+                boolean success = reviewService.addReview(review);
+
+                if (success)
+                    sendJsonResponse(exchange, 200, "{\"success\":true}");
+                else
+                    sendJsonResponse(exchange, 400, "{\"error\":\"Review failed\"}");
+            }
+        }
+    }
 
     static class HighRatedRentalsHandler implements HttpHandler {
         @Override
