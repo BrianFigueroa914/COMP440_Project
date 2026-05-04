@@ -50,22 +50,47 @@ document.getElementById("addRentalBtn").addEventListener("click", async () => {
 document.getElementById("searchBtn").addEventListener("click", async () => {
   const feature = document.getElementById("searchFeature").value;
 
+  if (!feature.trim()) {
+    await AppModal.show("Please enter a feature to search.", "Empty Search");
+    return;
+  }
+
   try {
     const res = await fetch(BASE + "/search?feature=" + encodeURIComponent(feature));
+    
+    if (!res.ok) {
+      console.error("Server error:", res.status, res.statusText);
+      await AppModal.show(`Server error: ${res.status} ${res.statusText}`, "Error");
+      return;
+    }
+
     const data = await res.json();
+    console.log("Search results:", data);
 
     const results = document.getElementById("results");
     results.innerHTML = "";
 
+    if (!Array.isArray(data)) {
+      console.error("Response is not an array:", data);
+      await AppModal.show("Invalid response from server.", "Error");
+      return;
+    }
+
+    if (data.length === 0) {
+      results.innerHTML = "<li>No results found.</li>";
+      return;
+    }
+
     data.forEach(item => {
       const li = document.createElement("li");
-//      const indicator = item.username == username ? " (Your Rental)" : "";
-      li.innerText = `ID: ${item.id} | ${item.title} | Price: $${item.price}`;
+      const indicator = item.username == username ? " (Your Rental)" : "";
+      li.innerText = `ID: ${item.id} | ${item.title} | $${item.price} | ${item.description} | Owner: ${item.username}${indicator}`;
       results.appendChild(li);
     });
 
   } catch (err) {
-    await AppModal.show("Search failed. Please try again.", "Error");
+    console.error("Search error:", err);
+    await AppModal.show(`Search failed: ${err.message}`, "Error");
   }
 });
 

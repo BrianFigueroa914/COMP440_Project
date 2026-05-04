@@ -1,10 +1,10 @@
 package services;
 
-import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
@@ -12,6 +12,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
 import database.DatabaseConnection;
 
@@ -128,11 +131,11 @@ public class Server {
                     boolean authenticated = authenticateUser(username, password);
 
                     if (authenticated) {
-                        System.out.println("✓ User logged in: " + username);
+                        System.out.println("User logged in: " + username);
                         sendJsonResponse(exchange, 200, 
                             "{\"success\": true, \"message\": \"Login successful.\"}");
                     } else {
-                        System.out.println("✗ Login failed for user: " + username);
+                        System.out.println("Login failed for user: " + username);
                         sendJsonResponse(exchange, 401, 
                             "{\"success\": false, \"error\": \"Invalid username or password.\"}");
                     }
@@ -194,12 +197,18 @@ public class Server {
                         first = false;
 
                         result.append("{\"id\":").append(rs.getInt("id"))
-                              .append(",\"title\":\"").append(rs.getString("title")).append("\"}");
+                              .append(",\"title\":\"").append(escapeJson(rs.getString("title")))
+                              .append("\",\"description\":\"").append(escapeJson(rs.getString("description")))
+
+                              .append("\",\"price\":").append(rs.getInt("price"))
+                              .append(",\"username\":\"").append(escapeJson(rs.getString("username")))
+                              .append("\"}");
                     }
 
                     result.append("]");
                     sendJsonResponse(exchange, 200, result.toString());
                 } catch (Exception e) {
+                    e.printStackTrace();
                     sendJsonResponse(exchange, 500, "{\"error\":\"Search failed\"}");
                 }
             }
