@@ -1,6 +1,35 @@
 const BASE = "http://localhost:8080";
 
 const username = localStorage.getItem("username");
+const id_width = 7;
+const title_width = 30;
+const price_width = 5;
+const owner_width = 50;
+let searchResults = [];
+
+    // formatting output
+    function col(text , width) {
+      return String(text).padEnd(width);
+    }
+
+    function renderList(data, username) {
+      const results = document.getElementById("results");
+      results.innerHTML = "";
+
+      data.forEach(item => {
+        const li = document.createElement("li");
+        const indicator = item.username == username ? " (Your Rental)" : "";
+
+        li.innerText = [
+          col(`ID: ${item.id}`, id_width),
+          col(item.title, title_width),
+          col(`$${item.price}`, price_width),
+          col(`Owner: ${item.username}${indicator}`, owner_width)
+        ].join(" | ");
+
+        results.appendChild(li);
+      });
+    }
 
 if (!username) {
   AppModal.show("You are not logged in.", "Not Logged In").then(() => {
@@ -81,17 +110,27 @@ document.getElementById("searchBtn").addEventListener("click", async () => {
       return;
     }
 
-    data.forEach(item => {
-      const li = document.createElement("li");
-      const indicator = item.username == username ? " (Your Rental)" : "";
-      li.innerText = `ID: ${item.id} | ${item.title} | $${item.price} | ${item.description} | Owner: ${item.username}${indicator}`;
-      results.appendChild(li);
-    });
+    searchResults = data;   // save results globally
+    renderList(searchResults, username);
+
 
   } catch (err) {
     console.error("Search error:", err);
     await AppModal.show(`Search failed: ${err.message}`, "Error");
   }
+});
+
+document.getElementById("priceFilter").addEventListener("change", async (e) => {
+  const value = e.target.value;
+  if (value === "asc") {
+    searchResults.sort((a, b) => a.price - b.price);
+  } else if (value === "desc") {
+    searchResults.sort((a, b) => b.price - a.price);
+  }else {
+    searchResults.sort((a, b) => a.id - b.id); // default order by ID  
+  }
+
+  renderList(searchResults,username);
 });
 
 document.getElementById("reviewBtn").addEventListener("click", async () => {
