@@ -96,3 +96,58 @@ document.getElementById("reviewBtn").addEventListener("click", async () => {
     await AppModal.show("Server error. Please try again.", "Error");
   }
 });
+
+document.getElementById("highRatedBtn").addEventListener("click", async () => {
+  const hrUsername = document.getElementById("hrUsername").value;
+ 
+  try {
+    const res = await fetch(BASE + "/highRatedRentals?username=" + encodeURIComponent(hrUsername));
+    const data = await res.json();
+ 
+    const results = document.getElementById("hrResults");
+    results.innerHTML = "";
+ 
+    if (data.length === 0) {
+      const li = document.createElement("li");
+      li.innerText = "No rentals found with only Excellent or Good reviews.";
+      results.appendChild(li);
+      return;
+    }
+ 
+    data.forEach(item => {
+      const li = document.createElement("li");
+      li.innerText = `ID: ${item.id} | ${item.title} | ${item.feature} | $${item.price}/night`;
+      results.appendChild(li);
+    });
+  } catch (err) {
+    alert("Search failed");
+  }
+});
+ 
+
+document.getElementById("topPostersBtn").addEventListener("click", async () => {
+  const date = document.getElementById("posterDate").value;
+ 
+  try {
+    const res = await fetch(BASE + "/topPosters?date=" + encodeURIComponent(date));
+    const data = await res.json();
+ 
+    const results = document.getElementById("tpResults");
+    results.innerHTML = "";
+ 
+    if (data.length === 0) {
+      const li = document.createElement("li");
+      li.innerText = "No rentals posted on that date.";
+      results.appendChild(li);
+      return;
+    }
+ 
+    data.forEach(item => {
+      const li = document.createElement("li");
+      li.innerText = `${item.username} — ${item.total} rental(s) posted`;
+      results.appendChild(li);
+    });
+  } catch (err) {
+    alert("Search failed");
+  }
+});

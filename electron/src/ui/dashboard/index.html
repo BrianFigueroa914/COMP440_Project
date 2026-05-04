@@ -99,6 +99,36 @@
         <button id="reviewBtn" type="button">Submit Review</button>
       </div>
     </div>
+
+    <div class="dashboard-section">
+      <h3>Top Rated Rentals by User</h3>
+      <p>Shows rentals where all reviews are Excellent or Good.</p>
+      <div class="form-row">
+        <div class="input-group form-field">
+          <label for="hrUsername">Username</label>
+          <input id="hrUsername" placeholder="Enter username" />
+        </div>
+      </div>
+      <div class="button-group">
+        <button id="highRatedBtn" type="button">Search</button>
+      </div>
+      <ul id="hrResults"></ul>
+    </div>
+ 
+    <div class="dashboard-section">
+      <h3>Top Posters by Date</h3>
+      <p>Shows users who posted the most rentals on a given date (ties included).</p>
+      <div class="form-row">
+        <div class="input-group form-field">
+          <label for="posterDate">Date</label>
+          <input id="posterDate" type="date" />
+        </div>
+      </div>
+      <div class="button-group">
+        <button id="topPostersBtn" type="button">Search</button>
+      </div>
+      <ul id="tpResults"></ul>
+    </div>
   </div>
 
   <script src="../utils/modal.js"></script>
