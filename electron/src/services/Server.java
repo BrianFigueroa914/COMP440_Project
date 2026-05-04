@@ -1,10 +1,10 @@
 package services;
 
-import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
@@ -12,6 +12,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
 import database.DatabaseConnection;
 
@@ -30,6 +33,7 @@ public class Server {
         server.createContext("/addRental", new AddRentalHandler());
         server.createContext("/search", new SearchHandler());
         server.createContext("/review", new ReviewHandler());
+        server.createContext("/searchTwoFeatures", new SearchTwoFeaturesHandler());
         server.createContext("/highRatedRentals", new HighRatedRentalsHandler());
         server.createContext("/topPosters", new TopPostersHandler());
 
@@ -97,8 +101,6 @@ public class Server {
         }
     }
 
-
-
     // Handler for POST /login
     static class LoginHandler implements HttpHandler {
         @Override
@@ -130,11 +132,11 @@ public class Server {
                     boolean authenticated = authenticateUser(username, password);
 
                     if (authenticated) {
-                        System.out.println("✓ User logged in: " + username);
+                        System.out.println("User logged in: " + username);
                         sendJsonResponse(exchange, 200, 
                             "{\"success\": true, \"message\": \"Login successful.\"}");
                     } else {
-                        System.out.println("✗ Login failed for user: " + username);
+                        System.out.println("Login failed for user: " + username);
                         sendJsonResponse(exchange, 401, 
                             "{\"success\": false, \"error\": \"Invalid username or password.\"}");
                     }
@@ -149,6 +151,8 @@ public class Server {
             }
         }
     }
+    
+    // Handler for POST /addRental
     static class AddRentalHandler implements HttpHandler {
         public void handle(HttpExchange exchange) throws IOException {
             if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
@@ -173,6 +177,7 @@ public class Server {
         }
     }
 
+    // Handler for GET /search?feature=...
     static class SearchHandler implements HttpHandler {
         public void handle(HttpExchange exchange) throws IOException {
             if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
@@ -196,18 +201,25 @@ public class Server {
                         first = false;
 
                         result.append("{\"id\":").append(rs.getInt("id"))
-                              .append(",\"title\":\"").append(rs.getString("title")).append("\"}");
+                              .append(",\"title\":\"").append(escapeJson(rs.getString("title")))
+                              .append("\",\"description\":\"").append(escapeJson(rs.getString("description")))
+
+                              .append("\",\"price\":").append(rs.getInt("price"))
+                              .append(",\"username\":\"").append(escapeJson(rs.getString("username")))
+                              .append("\"}");
                     }
 
                     result.append("]");
                     sendJsonResponse(exchange, 200, result.toString());
                 } catch (Exception e) {
+                    e.printStackTrace();
                     sendJsonResponse(exchange, 500, "{\"error\":\"Search failed\"}");
                 }
             }
         }
     }
 
+    // Handler for POST /review
     static class ReviewHandler implements HttpHandler {
         public void handle(HttpExchange exchange) throws IOException {
             if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
@@ -230,6 +242,67 @@ public class Server {
             }
         }
     }
+
+static class SearchTwoFeaturesHandler implements HttpHandler {
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+            sendJsonResponse(exchange, 405, "{\"error\":\"Method not allowed\"}");
+            return;
+        }
+
+        try {
+            String query = exchange.getRequestURI().getQuery();
+            if (query == null || !query.contains("x=") || !query.contains("y=")) {
+                sendJsonResponse(exchange, 400, "{\"error\":\"Missing feature parameters\"}");
+                return;
+            }
+
+            String[] params = query.split("&");
+            String featureX = params[0].split("=")[1].toLowerCase();
+            String featureY = params[1].split("=")[1].toLowerCase();
+
+            String sql =
+                "SELECT DISTINCT r1.username " +
+                "FROM rental_unit r1 " +
+                "JOIN rental_unit r2 " +
+                "  ON r1.username = r2.username " +
+                " AND DATE(r1.created_at) = DATE(r2.created_at) " +
+                "WHERE FIND_IN_SET(?, REPLACE(LOWER(r1.feature), ' ', '')) " +
+                "  AND FIND_IN_SET(?, REPLACE(LOWER(r2.feature), ' ', '')) " +
+                "  AND r1.id <> r2.id";
+
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                stmt.setString(1, featureX);
+                stmt.setString(2, featureY);
+
+                ResultSet rs = stmt.executeQuery();
+
+                StringBuilder json = new StringBuilder("[");
+                boolean first = true;
+
+                while (rs.next()) {
+                    if (!first) json.append(",");
+                    first = false;
+
+                    json.append("{\"username\":\"")
+                        .append(escapeJson(rs.getString("username")))
+                        .append("\"}");
+                }
+
+                json.append("]");
+
+                sendJsonResponse(exchange, 200, json.toString());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendJsonResponse(exchange, 500, "{\"error\":\"Server error\"}");
+        }
+    }
+}
 
     static class HighRatedRentalsHandler implements HttpHandler {
         @Override

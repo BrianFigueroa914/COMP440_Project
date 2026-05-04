@@ -12,11 +12,8 @@
       <div class="header">
         <div class="logo">
         </div>
-        <h2>Welcome to the Dashboard</h2>
+        <h1 id="welcomeText">Welcome </h1>
       </div>
-
-      <p id="welcomeText"></p>
-      <p>You are logged in!</p>
 
       <div class="button-group">
         <button id="logoutBtn" type="button">Logout</button>
@@ -63,11 +60,41 @@
         </div>
       </div>
 
-      <div class="button-group">
-        <button id="searchBtn" type="button">Search</button>
+      <div class="search-row">
+        <div class="button-group">
+          <button id="searchBtn" type="button">Search</button>
+        </div>
+
+        <select id="priceFilter">
+          <option value="none">Sort by price</option>
+          <option value="desc">Highest → Lowest</option>
+          <option value="asc">Lowest → Highest</option>
+        </select>
       </div>
 
       <ul id="results"></ul>
+    </div>
+
+    <div class="dashboard-section">
+      <h3>Search Users by Two Features (Same Day)</h3>
+
+      <div class="form-row">
+        <div class="input-group form-field">
+          <label for="featureX">Feature X</label>
+          <input id="featureX" placeholder="e.g., wifi" />
+        </div>
+
+        <div class="input-group form-field">
+          <label for="featureY">Feature Y</label>
+          <input id="featureY" placeholder="e.g., kitchen" />
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button id="searchTwoBtn" type="button">Search Users</button>
+      </div>
+
+      <ul id="twoFeatureResults"></ul>
     </div>
 
     <div class="dashboard-section">

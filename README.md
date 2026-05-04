@@ -50,13 +50,90 @@ COMP440_Project/
 
 1. **Node.js** (v18 or later) and npm – required for the Electron frontend.
 2. **Java JDK** (v11 or later) – needed to compile/run the backend server.
-3. **MySQL Server 8.0+** – database for storing user credentials.
-4. **MySQL Workbench 8.0** – GUI tool for database management.
-5. **MySQL Connector/J** – already included in `lib/` folder.
+3. **Maven 3.8+** – build tool for Java (simplifies compilation and running).
+4. **MySQL Server 8.0+** – database for storing user credentials.
+5. **MySQL Workbench 8.0** – GUI tool for database management.
+6. **MySQL Connector/J** – already included in `lib/` folder.
 
 ---
 
-## 🔧 Setup & Installation
+## � Maven Installation Guide
+
+### Windows
+
+1. **Download Maven**:
+   - Visit (https://maven.apache.org/download.cgi)
+   - Download the binary zip archive (e.g., `apache-maven-3.9.x-bin.zip`)
+
+2. **Extract Maven**:
+   - Extract the zip to `C:\Program Files\Apache\maven` (or your preferred location)
+
+3. **Add Maven to PATH**:
+   - Right-click "This PC" or "My Computer" → **Properties**
+   - Click **Advanced system settings**
+   - Click **Environment Variables...**
+   - Under "User variables" or "System variables", click **New** (or edit existing **PATH**)
+   - Add: `C:\Program Files\Apache\maven\bin`
+   - Click **OK** → **OK** → **OK**
+
+4. **Verify Installation** (restart terminal):
+   ```powershell
+   mvn --version
+   ```
+   You should see Maven version information.
+
+### macOS
+
+#### Option 1: Using Homebrew (Recommended)
+
+```bash
+# Install Homebrew if you don't have it
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install Maven
+brew install maven
+
+# Verify installation
+mvn --version
+```
+
+#### Option 2: Manual Installation
+
+1. **Download Maven**:
+   ```bash
+   cd ~/Downloads
+   curl -O https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
+   ```
+
+2. **Extract Maven**:
+   ```bash
+   tar -xzf apache-maven-3.9.6-bin.tar.gz
+   sudo mv apache-maven-3.9.6 /usr/local/maven
+   ```
+
+3. **Add Maven to PATH**:
+   - Open `~/.zprofile` (or `~/.bash_profile` for older Macs):
+     ```bash
+     nano ~/.zprofile
+     ```
+   - Add this line:
+     ```bash
+     export PATH="/usr/local/maven/bin:$PATH"
+     ```
+   - Save (Ctrl+X → Y → Enter)
+   - Reload:
+     ```bash
+     source ~/.zprofile
+     ```
+
+4. **Verify Installation**:
+   ```bash
+   mvn --version
+   ```
+
+---
+
+
 
 ### Step 1: Verify MySQL Server is Running
 
@@ -154,18 +231,14 @@ npm install
 
 ## ▶️ Running the Application
 
-### Terminal 1: Start the Java Backend Server(vs code terminal recommended)
+### Terminal 1: Start the Java Backend Server (Using Maven in vs code terminal - Recommended)
+
+Maven automatically recompiles your code every time, so you don't need to manually manage `.class` files.
 
 ```bash
-cd COMP440_Project/electron/src
-javac -cp ..\..\lib\mysql-connector-j-9.6.0.jar database/DatabaseConnection.java services/InputValidator.java services/AuthService.java services/Server.java
-java -cp ".;..\..\lib\mysql-connector-j-9.6.0.jar" services.Server
+cd COMP440_Project
+mvn clean compile exec:java
 ```
-
-> On **macOS/Linux**, use `:` instead of `;` in the classpath:
-> ```bash
-> java -cp ".:../../lib/mysql-connector-j-9.6.0.jar" services.Server
-> ```
 
 You should see:
 ```
@@ -173,6 +246,31 @@ You should see:
   POST /register - Register a new user
   POST /login - Login an existing user
 ```
+
+**Subsequent runs** (after code changes):
+```bash
+mvn clean compile exec:java
+```
+
+### Alternative: Manual Compilation (Without Maven)
+
+If you prefer not to use Maven:
+
+**Windows**:
+```bash
+cd COMP440_Project/electron/src
+javac -cp ..\..\lib\mysql-connector-j-9.6.0.jar database/DatabaseConnection.java services/InputValidator.java services/AuthService.java services/Server.java
+java -cp ".;..\..\lib\mysql-connector-j-9.6.0.jar" services.Server
+```
+
+**macOS/Linux** (use `:` instead of `;`):
+```bash
+cd COMP440_Project/electron/src
+javac -cp ../../lib/mysql-connector-j-9.6.0.jar database/DatabaseConnection.java services/InputValidator.java services/AuthService.java services/Server.java
+java -cp ".:../../lib/mysql-connector-j-9.6.0.jar" services.Server
+```
+
+---
 
 ### Terminal 2: Start the Electron Frontend (gitbash recommended)
 

@@ -4,11 +4,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 public class DatabaseConnection {
 
-    private static final String URL = getEnv("DB_URL", "jdbc:mysql://127.0.0.1:3306/mydb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true");
-    private static final String USER = getEnv("DB_USER", "root");
-    private static final String PASSWORD = getEnv("DB_PASSWORD", "fnysse");
+    private static final Dotenv dotenv = Dotenv.load();
+    private static final String URL = dotenv.get("DB_URL");
+    private static final String USER = dotenv.get("DB_USER");
+    private static final String PASSWORD = dotenv.get("DB_PASSWORD");
 
     private static Connection connection;
 
@@ -20,18 +23,21 @@ public class DatabaseConnection {
     }
 
     private static void connect() throws SQLException {
+        // Validate that .env values are loaded
+        if (URL == null || USER == null || PASSWORD == null) {
+            throw new SQLException("Missing .env variables: DB_URL, DB_USER, or DB_PASSWORD not found. " +
+                "Make sure .env file exists in the project root with these values.");
+        }
+
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             throw new SQLException("MySQL JDBC Driver not found.", e);
         }
 
+        System.out.println("Connecting to database: " + URL);
         connection = DriverManager.getConnection(URL, USER, PASSWORD);
-    }
-
-    private static String getEnv(String key, String defaultValue) {
-        String value = System.getenv(key);
-        return (value == null || value.isEmpty()) ? defaultValue : value;
+        System.out.println("Database connection successful!");
     }
 
     public static void close() {

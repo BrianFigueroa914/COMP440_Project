@@ -1,6 +1,35 @@
 const BASE = "http://localhost:8080";
 
 const username = localStorage.getItem("username");
+const id_width = 7;
+const title_width = 30;
+const price_width = 5;
+const owner_width = 50;
+let searchResults = [];
+
+    // formatting output
+    function col(text , width) {
+      return String(text).padEnd(width);
+    }
+
+    function renderList(data, username) {
+      const results = document.getElementById("results");
+      results.innerHTML = "";
+
+      data.forEach(item => {
+        const li = document.createElement("li");
+        const indicator = item.username == username ? " (Your Rental)" : "";
+
+        li.innerText = [
+          col(`ID: ${item.id}`, id_width),
+          col(item.title, title_width),
+          col(`$${item.price}`, price_width),
+          col(`Owner: ${item.username}${indicator}`, owner_width)
+        ].join(" | ");
+
+        results.appendChild(li);
+      });
+    }
 
 if (!username) {
   AppModal.show("You are not logged in.", "Not Logged In").then(() => {
@@ -9,7 +38,7 @@ if (!username) {
 }
 
 document.getElementById("welcomeText").innerText =
-  "Logged in as: " + username;
+  "Welcome, " + username + "!";
 
 document.getElementById("logoutBtn").addEventListener("click", () => {
   localStorage.removeItem("username");
@@ -50,23 +79,95 @@ document.getElementById("addRentalBtn").addEventListener("click", async () => {
 document.getElementById("searchBtn").addEventListener("click", async () => {
   const feature = document.getElementById("searchFeature").value;
 
+  if (!feature.trim()) {
+    await AppModal.show("Please enter a feature to search.", "Empty Search");
+    return;
+  }
+
   try {
     const res = await fetch(BASE + "/search?feature=" + encodeURIComponent(feature));
+    
+    if (!res.ok) {
+      console.error("Server error:", res.status, res.statusText);
+      await AppModal.show(`Server error: ${res.status} ${res.statusText}`, "Error");
+      return;
+    }
+
     const data = await res.json();
+    console.log("Search results:", data);
 
     const results = document.getElementById("results");
     results.innerHTML = "";
 
-    data.forEach(item => {
+    if (!Array.isArray(data)) {
+      console.error("Response is not an array:", data);
+      await AppModal.show("Invalid response from server.", "Error");
+      return;
+    }
+
+    if (data.length === 0) {
+      results.innerHTML = "<li>No results found.</li>";
+      return;
+    }
+
+    searchResults = data;   // save results globally
+    renderList(searchResults, username);
+
+
+  } catch (err) {
+    console.error("Search error:", err);
+    await AppModal.show(`Search failed: ${err.message}`, "Error");
+  }
+});
+document.getElementById("searchTwoBtn").addEventListener("click", async () => {
+  const x = document.getElementById("featureX").value.trim();
+  const y = document.getElementById("featureY").value.trim();
+
+  if (!x || !y) {
+    await AppModal.show("Please enter both features.", "Missing Input");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${BASE}/searchTwoFeatures?x=${encodeURIComponent(x)}&y=${encodeURIComponent(y)}`);
+
+    if (!res.ok) {
+      await AppModal.show("Server error while searching.", "Error");
+      return;
+    }
+
+    const data = await res.json();
+    const list = document.getElementById("twoFeatureResults");
+    list.innerHTML = "";
+
+    if (data.length === 0) {
+      list.innerHTML = "<li>No users found.</li>";
+      return;
+    }
+
+    data.forEach(user => {
       const li = document.createElement("li");
-      const indicator = item.username == username ? " (Your Rental)" : "";
-      li.innerText = `ID: ${item.id} | ${item.title}${indicator}`;
-      results.appendChild(li);
+      li.innerText = `User: ${user.username}`;
+      list.appendChild(li);
     });
 
   } catch (err) {
-    await AppModal.show("Search failed. Please try again.", "Error");
+    console.error(err);
+    await AppModal.show("Search failed: " + err.message, "Error");
   }
+});
+
+document.getElementById("priceFilter").addEventListener("change", async (e) => {
+  const value = e.target.value;
+  if (value === "asc") {
+    searchResults.sort((a, b) => a.price - b.price);
+  } else if (value === "desc") {
+    searchResults.sort((a, b) => b.price - a.price);
+  }else {
+    searchResults.sort((a, b) => a.id - b.id); // default order by ID  
+  }
+
+  renderList(searchResults,username);
 });
 
 document.getElementById("reviewBtn").addEventListener("click", async () => {

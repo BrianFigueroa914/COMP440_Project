@@ -249,3 +249,28 @@ select {
 .form-msg.error {
   color: #d32f2f;
 }
+
+li {
+  font-family: monospace;
+  white-space: pre;
+}
+
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* spacing between elements */
+}
+
+#searchBtn,
+#priceFilter {
+  text-align: center;
+  height: 40px;          /* same height */
+  width: 200px;
+  padding: 0 15px;       /* same horizontal padding */
+  font-size: 16px;       /* same text size */
+  border-radius: 5px;    /* same rounded corners */
+}
+
+#priceFilter {
+  cursor: pointer;
+}
