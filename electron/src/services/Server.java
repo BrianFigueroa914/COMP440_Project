@@ -30,6 +30,8 @@ public class Server {
         server.createContext("/addRental", new AddRentalHandler());
         server.createContext("/search", new SearchHandler());
         server.createContext("/review", new ReviewHandler());
+        server.createContext("/highRatedRentals", new HighRatedRentalsHandler());
+        server.createContext("/topPosters", new TopPostersHandler());
 
         server.setExecutor(null); // use default executor
         server.start();
@@ -229,6 +231,122 @@ public class Server {
         }
     }
 
+    static class HighRatedRentalsHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+                sendJsonResponse(exchange, 405, "{\"error\":\"Method not allowed\"}");
+                return;
+            }
+
+            String query = exchange.getRequestURI().getQuery();
+            String username = "";
+            if (query != null) {
+                for (String param : query.split("&")) {
+                    String[] kv = param.split("=");
+                    if (kv.length == 2 && kv[0].equals("username"))
+                        username = java.net.URLDecoder.decode(kv[1], "UTF-8");
+                }
+            }
+
+            String sql = """
+                SELECT r.id, r.title, r.feature, r.price
+                FROM rental_unit r
+                WHERE r.username = ?
+                AND EXISTS (
+                    SELECT 1 FROM review rv WHERE rv.rental_id = r.id
+                )
+                AND NOT EXISTS (
+                      SELECT 1 FROM review rv
+                      WHERE rv.rental_id = r.id
+                        AND rv.rating NOT IN ('excellent', 'good')
+                )
+            """;
+
+            StringBuilder json = new StringBuilder("[");
+            try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                stmt.setString(1, username);
+                ResultSet rs = stmt.executeQuery();
+                boolean first = true;
+                while (rs.next()) {
+                    if (!first) json.append(",");
+                    json.append(String.format(
+                        "{\"id\":%d,\"title\":\"%s\",\"feature\":\"%s\",\"price\":%.2f}",
+                        rs.getInt("id"),
+                        rs.getString("title").replace("\"", "\\\""),
+                        rs.getString("feature").replace("\"", "\\\""),
+                        rs.getDouble("price")
+                    ));
+                    first = false;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            json.append("]");
+            sendJsonResponse(exchange, 200, json.toString());
+        }
+    }   
+
+    static class TopPostersHandler implements HttpHandler {
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+            sendJsonResponse(exchange, 405, "{\"error\":\"Method not allowed\"}");
+            return;
+        }
+
+        // Parse ?date=YYYY-MM-DD from URL
+        String query = exchange.getRequestURI().getQuery();
+        String date = "";
+        if (query != null) {
+            for (String param : query.split("&")) {
+                String[] kv = param.split("=");
+                if (kv.length == 2 && kv[0].equals("date"))
+                    date = java.net.URLDecoder.decode(kv[1], "UTF-8");
+            }
+        }
+
+        String sql = """
+            SELECT username, COUNT(*) AS total
+            FROM rental_unit
+            WHERE DATE(created_at) = ?
+            GROUP BY username
+            HAVING COUNT(*) = (
+                SELECT MAX(cnt) FROM (
+                    SELECT COUNT(*) AS cnt
+                    FROM rental_unit
+                    WHERE DATE(created_at) = ?
+                    GROUP BY username
+                ) AS sub
+            )
+        """;
+
+        StringBuilder json = new StringBuilder("[");
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, date);
+            stmt.setString(2, date);
+            ResultSet rs = stmt.executeQuery();
+            boolean first = true;
+            while (rs.next()) {
+                if (!first) json.append(",");
+                json.append(String.format(
+                    "{\"username\":\"%s\",\"total\":%d}",
+                    rs.getString("username").replace("\"", "\\\""),
+                    rs.getInt("total")
+                ));
+                first = false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        json.append("]");
+        sendJsonResponse(exchange, 200, json.toString());
+        }
+    }
 
     // Authenticate user by checking username and password against database
     private static boolean authenticateUser(String username, String password) {
