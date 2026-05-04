@@ -98,8 +98,6 @@ public class Server {
         }
     }
 
-
-
     // Handler for POST /login
     static class LoginHandler implements HttpHandler {
         @Override
@@ -150,6 +148,8 @@ public class Server {
             }
         }
     }
+    
+    // Handler for POST /addRental
     static class AddRentalHandler implements HttpHandler {
         public void handle(HttpExchange exchange) throws IOException {
             if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
@@ -174,6 +174,7 @@ public class Server {
         }
     }
 
+    // Handler for GET /search?feature=...
     static class SearchHandler implements HttpHandler {
         public void handle(HttpExchange exchange) throws IOException {
             if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
@@ -215,6 +216,7 @@ public class Server {
         }
     }
 
+    // Handler for POST /review
     static class ReviewHandler implements HttpHandler {
         public void handle(HttpExchange exchange) throws IOException {
             if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
@@ -238,6 +240,67 @@ public class Server {
         }
     }
 
+static class SearchTwoFeaturesHandler implements HttpHandler {
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+            sendJsonResponse(exchange, 405, "{\"error\":\"Method not allowed\"}");
+            return;
+        }
+
+        try {
+            String query = exchange.getRequestURI().getQuery();
+            if (query == null || !query.contains("x=") || !query.contains("y=")) {
+                sendJsonResponse(exchange, 400, "{\"error\":\"Missing feature parameters\"}");
+                return;
+            }
+
+            String[] params = query.split("&");
+            String featureX = params[0].split("=")[1];
+            String featureY = params[1].split("=")[1];
+
+            String sql =
+                "SELECT r1.username " +
+                "FROM rental_unit r1 " +
+                "JOIN rental_unit r2 " +
+                "  ON r1.username = r2.username " +
+                " AND DATE(r1.created_at) = DATE(r2.created_at) " +
+                "WHERE r1.feature LIKE ? " +
+                "  AND r2.feature LIKE ? " +
+                "  AND r1.id <> r2.id " +
+                "GROUP BY r1.username";
+
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                stmt.setString(1, "%" + featureX + "%");
+                stmt.setString(2, "%" + featureY + "%");
+
+                ResultSet rs = stmt.executeQuery();
+
+                StringBuilder json = new StringBuilder("[");
+                boolean first = true;
+
+                while (rs.next()) {
+                    if (!first) json.append(",");
+                    first = false;
+
+                    json.append("{\"username\":\"")
+                        .append(escapeJson(rs.getString("username")))
+                        .append("\"}");
+                }
+
+                json.append("]");
+
+                sendJsonResponse(exchange, 200, json.toString());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendJsonResponse(exchange, 500, "{\"error\":\"Server error\"}");
+        }
+    }
+}
 
     // Authenticate user by checking username and password against database
     private static boolean authenticateUser(String username, String password) {

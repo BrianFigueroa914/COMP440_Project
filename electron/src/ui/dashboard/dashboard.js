@@ -119,6 +119,43 @@ document.getElementById("searchBtn").addEventListener("click", async () => {
     await AppModal.show(`Search failed: ${err.message}`, "Error");
   }
 });
+document.getElementById("searchTwoBtn").addEventListener("click", async () => {
+  const x = document.getElementById("featureX").value.trim();
+  const y = document.getElementById("featureY").value.trim();
+
+  if (!x || !y) {
+    await AppModal.show("Please enter both features.", "Missing Input");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${BASE}/searchTwoFeatures?x=${encodeURIComponent(x)}&y=${encodeURIComponent(y)}`);
+
+    if (!res.ok) {
+      await AppModal.show("Server error while searching.", "Error");
+      return;
+    }
+
+    const data = await res.json();
+    const list = document.getElementById("twoFeatureResults");
+    list.innerHTML = "";
+
+    if (data.length === 0) {
+      list.innerHTML = "<li>No users found.</li>";
+      return;
+    }
+
+    data.forEach(user => {
+      const li = document.createElement("li");
+      li.innerText = `User: ${user.username}`;
+      list.appendChild(li);
+    });
+
+  } catch (err) {
+    console.error(err);
+    await AppModal.show("Search failed: " + err.message, "Error");
+  }
+});
 
 document.getElementById("priceFilter").addEventListener("change", async (e) => {
   const value = e.target.value;
