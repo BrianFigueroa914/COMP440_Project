@@ -6,159 +6,135 @@
   <title>Dashboard</title>
   <link rel="stylesheet" href="../../../styles.css" />
 </head>
-<body class = "dashboard-page">
+
+<body class="dashboard-page">
+
   <div class="dashboard-container">
+
+    <!-- HEADER -->
     <div class="dashboard-header">
       <div class="header">
         <div class="logo">
         </div>
-        <h1 id="welcomeText">Welcome </h1>
+        <h1 id="welcomeText">Welcome</h1>
       </div>
 
-      <div class="button-group">
-        <button id="logoutBtn" type="button">Logout</button>
-      </div>
     </div>
 
-    <div class="dashboard-section">
+    <!-- TAB BAR -->
+    <div class="tab-bar">
+      <button class="tab active" onclick="showTab('addRental')">Add Rental</button>
+      <button class="tab" onclick="showTab('searchRentals')">Search Rentals</button>
+      <button class="tab" onclick="showTab('twoFeatures')">Two Features</button>
+      <button class="tab" onclick="showTab('reviews')">Add Review</button>
+      <button class="tab" onclick="showTab('highRated')">Top Rated</button>
+      <button class="tab" onclick="showTab('topPosters')">Top Posters</button>
+      <button class="tab" onclick="showTab('poorUsers')">Poor Reviewers</button>
+      <button class="tab" onclick="showTab('cleanUsers')">No Poor Reviews</button>
+      <button id="logoutBtn" type="button">Logout</button>
+    </div>
+
+    <!-- ADD RENTAL -->
+    <div id="addRental" class="tab-content">
       <h3>Add Rental</h3>
 
       <div class="form-row">
-        <div class="input-group form-field">
-          <label for="title">Title</label>
-          <input id="title" placeholder="Title" />
-        </div>
-
-        <div class="input-group form-field">
-          <label for="description">Description</label>
-          <input id="description" placeholder="Description" />
-        </div>
-
-        <div class="input-group form-field">
-          <label for="feature">Feature</label>
-          <input id="feature" placeholder="Feature (wifi, kitchen...)" />
-        </div>
-
-        <div class="input-group form-field">
-          <label for="price">Price</label>
-          <input id="price" placeholder="Price" />
-        </div>
-      </div>
-
-      <div class="button-group">
+        <input id="title" placeholder="Title" />
+        <input id="description" placeholder="Description" />
+        <input id="feature" placeholder="Feature (wifi, kitchen...)" />
+        <input id="price" placeholder="Price" />
         <button id="addRentalBtn" type="button">Add Rental</button>
       </div>
     </div>
 
-    <div class="dashboard-section">
-      <h3>Search Rentals</h3>
 
-      <div class="form-row">
-        <div class="input-group form-field">
-          <label for="searchFeature">Enter Feature</label>
-          <input id="searchFeature" placeholder="Enter feature" />
-        </div>
+  <!-- SEARCH RENTALS -->
+  <div id="searchRentals" class="tab-content hidden">
+    <h3>Search Rentals</h3>
+
+     <div class="form-row">
+      <input id="searchFeature" placeholder="Enter feature" />
+
+      <select id="priceFilter">
+        <option value="none">Sort by price</option>
+        <option value="desc">Highest → Lowest</option>
+        <option value="asc">Lowest → Highest</option>
+      </select>
+    
+      <button id="searchBtn" type="button">Search</button>
       </div>
 
-      <div class="search-row">
-        <div class="button-group">
-          <button id="searchBtn" type="button">Search</button>
-        </div>
+    <ul id="results"></ul>
+  </div>
 
-        <select id="priceFilter">
-          <option value="none">Sort by price</option>
-          <option value="desc">Highest → Lowest</option>
-          <option value="asc">Lowest → Highest</option>
-        </select>
-      </div>
+  <!-- TWO FEATURES -->
+  <div id="twoFeatures" class="tab-content hidden">
+    <h3>Search Users by Two Features</h3>
 
-      <ul id="results"></ul>
+     <div class="form-row">
+      <input id="featureX" placeholder="Feature X" />
+      <input id="featureY" placeholder="Feature Y" />
+
+      <button id="searchTwoBtn" type="button">Search Users</button>
     </div>
+    <ul id="twoFeatureResults"></ul>
+  </div>
 
-    <div class="dashboard-section">
-      <h3>Search Users by Two Features (Same Day)</h3>
+  <!-- REVIEWS -->
+  <div id="reviews" class="tab-content hidden">
+    <h3>Add Review</h3>
 
-      <div class="form-row">
-        <div class="input-group form-field">
-          <label for="featureX">Feature X</label>
-          <input id="featureX" placeholder="e.g., wi-fi" />
-        </div>
+     <div class="form-row">
+      <input id="rentalId" placeholder="Rental ID" />
 
-        <div class="input-group form-field">
-          <label for="featureY">Feature Y</label>
-          <input id="featureY" placeholder="e.g., kitchen" />
-        </div>
-      </div>
+      <select id="rating">
+        <option value="excellent">Excellent</option>
+        <option value="good">Good</option>
+        <option value="fair">Fair</option>
+        <option value="poor">Poor</option>
+      </select>
+    
+      <input id="comment" placeholder="Comment" />
+    
 
-      <div class="button-group">
-        <button id="searchTwoBtn" type="button">Search Users</button>
-      </div>
-
-      <ul id="twoFeatureResults"></ul>
+      <button id="reviewBtn" type="button">Submit Review</button>
     </div>
+  </div>
 
-    <div class="dashboard-section">
-      <h3>Add Review</h3>
-
-      <div class="form-row">
-        <div class="input-group form-field">
-          <label for="rentalId">Rental ID</label>
-          <input id="rentalId" placeholder="Rental ID" />
-        </div>
-
-        <div class="input-group form-field">
-          <label for="rating">Rating</label>
-          <select id="rating">
-            <option value="excellent">Excellent</option>
-            <option value="good">Good</option>
-            <option value="fair">Fair</option>
-            <option value="poor">Poor</option>
-          </select>
-        </div>
-
-        <div class="input-group form-field">
-          <label for="comment">Comment</label>
-          <input id="comment" placeholder="Comment" />
-        </div>
-      </div>
-
-      <div class="button-group">
-        <button id="reviewBtn" type="button">Submit Review</button>
-      </div>
+  <!-- HIGH RATED -->
+  <div id="highRated" class="tab-content hidden">
+    <h3>Top Rated Rentals</h3>
+    <div class="form-row">
+    <input id="hrUsername" placeholder="Enter username" />
+    <button id="highRatedBtn" type="button">Search</button>
     </div>
+    <ul id="hrResults"></ul>
+  </div>
 
-    <div class="dashboard-section">
-      <h3>Top Rated Rentals by User</h3>
-      <p>Shows rentals where all reviews are Excellent or Good.</p>
-      <div class="form-row">
-        <div class="input-group form-field">
-          <label for="hrUsername">Username</label>
-          <input id="hrUsername" placeholder="Enter username" />
-        </div>
-      </div>
-      <div class="button-group">
-        <button id="highRatedBtn" type="button">Search</button>
-      </div>
-      <ul id="hrResults"></ul>
+  <!-- TOP POSTERS -->
+  <div id="topPosters" class="tab-content hidden">
+    <h3>Top Posters</h3>
+    <div class="form-row">
+    <input id="posterDate" type="date" />
+    <button id="topPostersBtn" type="button">Search</button>
     </div>
- 
-    <div class="dashboard-section">
-      <h3>Top Posters by Date</h3>
-      <p>Shows users who posted the most rentals on a given date (ties included).</p>
-      <div class="form-row">
-        <div class="input-group form-field">
-          <label for="posterDate">Date</label>
-          <input id="posterDate" type="date" />
-        </div>
-      </div>
-      <div class="button-group">
-        <button id="topPostersBtn" type="button">Search</button>
-      </div>
-      <ul id="tpResults"></ul>
-    </div>
+    <ul id="tpResults"></ul>
+  </div>
+
+  <!-- POOR ONLY USERS -->
+  <div id="poorUsers" class="tab-content hidden">
+    <h3>Users who have only reviewed "poor"</h3>
+    <ul id="poorResults"></ul>
+  </div>
+
+  <!-- CLEAN USERS -->
+  <div id="cleanUsers" class="tab-content hidden">
+    <h3>Users With No Poor Reviews</h3>
+    <ul id="cleanResults"></ul>
   </div>
 
   <script src="../utils/modal.js"></script>
   <script src="dashboard.js"></script>
+
 </body>
 </html>
