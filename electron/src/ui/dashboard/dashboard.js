@@ -31,15 +31,32 @@ let searchResults = [];
       });
     }
 
+// tab to move around without scrolling so much
+function showTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(tab => {
+    tab.classList.add('hidden');
+  });
+
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.classList.remove('active');
+  });
+
+  document.getElementById(tabId).classList.remove('hidden');
+  event.target.classList.add('active');
+}
+
+//login check
 if (!username) {
   AppModal.show("You are not logged in.", "Not Logged In").then(() => {
     window.location.href = "../loginPage/index.html";
   });
 }
 
+//welcome text
 document.getElementById("welcomeText").innerText =
   "Welcome, " + username + "!";
 
+//buttons
 document.getElementById("logoutBtn").addEventListener("click", () => {
   localStorage.removeItem("username");
   window.location.href = "../loginPage/index.html";
@@ -250,5 +267,57 @@ document.getElementById("topPostersBtn").addEventListener("click", async () => {
     });
   } catch (err) {
     alert("Search failed");
+  }
+});
+
+document.querySelector("button[onclick=\"showTab('poorUsers')\"]")
+.addEventListener("click", async () => {
+  const list = document.getElementById("poorResults");
+  list.innerHTML = "";
+
+  try {
+    const res = await fetch(BASE + "/usersPoorOnly");
+    const data = await res.json();
+
+    if (data.length === 0) {
+      list.innerHTML = "<li>No users found.</li>";
+      return;
+    }
+
+    data.forEach(user => {
+      const li = document.createElement("li");
+      li.innerText = `User: ${user.username}`;
+      list.appendChild(li);
+    });
+
+  } catch (err) {
+    console.error(err);
+    list.innerHTML = "<li>Error loading data.</li>";
+  }
+});
+
+document.querySelector("button[onclick=\"showTab('cleanUsers')\"]")
+.addEventListener("click", async () => {
+  const list = document.getElementById("cleanResults");
+  list.innerHTML = "";
+
+  try {
+    const res = await fetch(BASE + "/usersNoPoor");
+    const data = await res.json();
+
+    if (data.length === 0) {
+      list.innerHTML = "<li>No users found.</li>";
+      return;
+    }
+
+    data.forEach(user => {
+      const li = document.createElement("li");
+      li.innerText = `User: ${user.username}`;
+      list.appendChild(li);
+    });
+
+  } catch (err) {
+    console.error(err);
+    list.innerHTML = "<li>Error loading data.</li>";
   }
 });
