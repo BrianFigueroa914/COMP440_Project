@@ -36,6 +36,8 @@ public class Server {
         server.createContext("/searchTwoFeatures", new SearchTwoFeaturesHandler());
         server.createContext("/highRatedRentals", new HighRatedRentalsHandler());
         server.createContext("/topPosters", new TopPostersHandler());
+        server.createContext("/usersPoorOnly", new UsersPoorOnlyHandler());
+        server.createContext("/usersNoPoor", new UsersNoPoorHandler());
 
         server.setExecutor(null); // use default executor
         server.start();
@@ -418,6 +420,110 @@ public class Server {
         }
         json.append("]");
         sendJsonResponse(exchange, 200, json.toString());
+        }
+    }
+    // Handler for poor-only reviewers
+    static class UsersPoorOnlyHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+            sendCorsResponse(exchange, 204, "");
+            return;
+            }
+
+            if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+                sendJsonResponse(exchange, 405, "{\"error\":\"Method not allowed\"}");
+                return;
+            }
+
+            String sql = """
+                SELECT DISTINCT r.username
+                FROM review r
+                WHERE r.username IS NOT NULL
+                AND NOT EXISTS (
+                    SELECT 1 FROM review r2
+                    WHERE r2.username = r.username
+                    AND r2.rating != 'poor'
+                )
+            """;
+
+            StringBuilder json = new StringBuilder("[");
+            try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                ResultSet rs = stmt.executeQuery();
+                boolean first = true;
+
+                while (rs.next()) {
+                    if (!first) json.append(",");
+                    json.append("{\"username\":\"")
+                        .append(escapeJson(rs.getString("username")))
+                        .append("\"}");
+                    first = false;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            json.append("]");
+            sendJsonResponse(exchange, 200, json.toString());
+        }
+    }
+
+    //Handler for users with no poor reviews
+    static class UsersNoPoorHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+            sendCorsResponse(exchange, 204, "");
+            return;
+            }
+            
+            if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+                sendJsonResponse(exchange, 405, "{\"error\":\"Method not allowed\"}");
+                return;
+            }
+
+            String sql = """
+                SELECT DISTINCT u.username
+                FROM rental_unit u
+                WHERE EXISTS (
+                    SELECT 1 FROM rental_unit r
+                    WHERE r.username = u.username
+                )
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM rental_unit r
+                    JOIN review rv ON r.id = rv.rental_id
+                    WHERE r.username = u.username
+                    AND rv.rating = 'poor'
+                )
+            """;
+
+            StringBuilder json = new StringBuilder("[");
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                ResultSet rs = stmt.executeQuery();
+                boolean first = true;
+
+                while (rs.next()) {
+                    if (!first) json.append(",");
+                    json.append("{\"username\":\"")
+                        .append(escapeJson(rs.getString("username")))
+                        .append("\"}");
+                    first = false;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            json.append("]");
+            sendJsonResponse(exchange, 200, json.toString());
         }
     }
 
