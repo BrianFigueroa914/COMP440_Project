@@ -422,6 +422,7 @@ public class Server {
         sendJsonResponse(exchange, 200, json.toString());
         }
     }
+   
     // Handler for poor-only reviewers
     static class UsersPoorOnlyHandler implements HttpHandler {
         @Override
