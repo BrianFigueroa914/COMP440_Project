@@ -1,4 +1,4 @@
-https://youtu.be/QnBxPN2rWt0
+https://youtu.be/QAVgUYwkKqg
 
 
 An Electron-based application with a Java backend for user authentication, built for the COMP440 course. The app provides a login/signup UI and stores credentials in a local MySQL database with SQL injection protection and input validation.
